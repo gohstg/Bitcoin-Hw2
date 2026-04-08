@@ -5,9 +5,12 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const res = await fetch("http://localhost:3000/api/indicator", {
+    const url = new URL(request.url);
+    const baseUrl = url.origin;
+
+    const res = await fetch(`${baseUrl}/api/indicator`, {
       cache: "no-store",
     });
 

@@ -1,4 +1,5 @@
 import IndicatorChart from "../components/IndicatorChart";
+import { headers } from "next/headers";
 
 type DataPoint = {
   date: string;
@@ -24,8 +25,21 @@ type SummaryResponse = {
   error?: string;
 };
 
+async function getBaseUrl() {
+  const h = await headers();
+  const host = h.get("host");
+
+  if (!host) {
+    throw new Error("Missing host header");
+  }
+
+  const protocol = host.includes("localhost") ? "http" : "https";
+  return `${protocol}://${host}`;
+}
+
 async function getIndicatorData(): Promise<IndicatorResponse> {
-  const res = await fetch("http://localhost:3000/api/indicator", {
+  const baseUrl = await getBaseUrl();
+  const res = await fetch(`${baseUrl}/api/indicator`, {
     cache: "no-store",
   });
 
@@ -38,7 +52,8 @@ async function getIndicatorData(): Promise<IndicatorResponse> {
 }
 
 async function getSummaryData(): Promise<SummaryResponse> {
-  const res = await fetch("http://localhost:3000/api/summary", {
+  const baseUrl = await getBaseUrl();
+  const res = await fetch(`${baseUrl}/api/summary`, {
     cache: "no-store",
   });
 
@@ -72,14 +87,20 @@ export default async function Home() {
             <div className="bg-white rounded-2xl shadow-sm border p-5">
               <h2 className="text-sm text-gray-500 mb-2">Latest BTC Price</h2>
               <p className="text-2xl font-semibold">
-                ${latest.btcPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                $
+                {latest.btcPrice.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border p-5">
               <h2 className="text-sm text-gray-500 mb-2">Latest MSTR Price</h2>
               <p className="text-2xl font-semibold">
-                ${latest.stockPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                $
+                {latest.stockPrice.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
 
