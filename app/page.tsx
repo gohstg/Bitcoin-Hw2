@@ -51,10 +51,15 @@ async function getIndicatorData(): Promise<IndicatorResponse> {
   return res.json();
 }
 
-async function getSummaryData(): Promise<SummaryResponse> {
+async function getSummaryData(data: DataPoint[]): Promise<SummaryResponse> {
   const baseUrl = await getBaseUrl();
   const res = await fetch(`${baseUrl}/api/summary`, {
+    method: "POST",
     cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ data }),
   });
 
   if (!res.ok) {
@@ -68,7 +73,7 @@ async function getSummaryData(): Promise<SummaryResponse> {
 export default async function Home() {
   try {
     const result = await getIndicatorData();
-    const summaryResult = await getSummaryData();
+    const summaryResult = await getSummaryData(result.data);
 
     const latest = result.data[result.data.length - 1];
 
